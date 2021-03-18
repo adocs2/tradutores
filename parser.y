@@ -112,14 +112,10 @@ void free_symbol_table();
     struct node* node;
 }
 
-%token <token> INT FLOAT SET STR ELEM EMPTY
-%token <token> TYPE
-%token <token> ID
-%token <token> IF ELSE RETURN PRINTF FOR FORALL READ
-%token <token> ADD REMOVE IN WRITE WRITELN EXISTS IS_SET
-%token <token> QUOTES
+%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN PRINTF FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES
 
 %right <token> ASSIGN
+
 %left <token> OP RELOP LOG
 
 %type <node> program declaration-list variable-declaration function params-list compound-stmt params local_declaration stmt-list stmt expr simple-expr conditional-stmt
@@ -651,7 +647,7 @@ void print_symbol_table() {
     printf("\n\n----------  TABELA DE SÍMBOLOS ----------\n\n");
     for(s=symbol_table; s != NULL; s=s->hh.next) {
         if(s->symbol_type != 'P'){
-            printf("key: %30s | name: %20s | type: %10s | symbol_type: %c | scope: %10s |\n", s->key, s->name, s->type, s->symbol_type, s->scope_name);
+            printf("key: %s | name: %s | type: %s | symbol_type: %c | scope: %s |\n", s->key, s->name, s->type, s->symbol_type, s->scope_name);
             if(s->symbol_type == 'F'){
                 for(p=s->param_list; p != NULL; p=p->next) {
                     HASH_FIND_STR(symbol_table, p->key, ps);
@@ -659,7 +655,7 @@ void print_symbol_table() {
                         for(number_of_space = 36; number_of_space > 0; number_of_space--){
                             printf(" ");
                         }
-                        printf("| param_name: %14s | type: %10s | symbol_type: %c | scope: %10s |\n", ps->name, ps->type, ps->symbol_type, ps->scope_name);
+                        printf("| param_name: %s | type: %s | symbol_type: %c | scope: %s |\n", ps->name, ps->type, ps->symbol_type, ps->scope_name);
                     }
                 }
             }
