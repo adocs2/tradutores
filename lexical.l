@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "parser.tab.h"
 
 char openParenthesis[] = "(";
 char closeParenthesis[] = ")";
@@ -58,81 +59,119 @@ QUOTES \"
     if(inside_string) { 
         BEGIN(0);
         inside_string--;
-        printf("%s%s\n", yytext, closeParenthesis);
+        // printf("%s%s\n", yytext, closeParenthesis);
+        return QUOTES;
     }
     else { 
         BEGIN(STRING);
         inside_string++;
-        printf("STRING\t\t%s%s", openParenthesis, yytext);
+        // printf("STRING\t\t%s%s", openParenthesis, yytext);
+        return QUOTES;
     }
 }
 
 
 <STRING>{STR} { 
     if(strcmp(yytext, "\n") == 0){line++;} 
-    printf("%s", yytext);
+    // printf("%s", yytext);
+    yylval.token = (char *) strdup(yytext);
+    return STR; 
 
 }
 {INT} {
     printf("INT\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return INT; 
 }
 
 {FLOAT} {
     printf("FLOAT\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return FLOAT; 
 }
 
 {TYPE} {
     printf("TYPE\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return TYPE;
 }
 
 "if" {
     printf("IF\n");
+    yylval.token = (char *) strdup(yytext);
+    return IF;
 }
 "else" {
     printf("ELSE\n");
+    yylval.token = (char *) strdup(yytext);
+    return ELSE;
 }
 "return" {
     printf("RETURN\n");
+    yylval.token = (char *) strdup(yytext);
+    return RETURN;
 }
 "printf" {
     printf("PRINT\n");
+    yylval.token = (char *) strdup(yytext);
+    return PRINTF;
 }
 
 "read" {
     printf("READ\n");
+    yylval.token = (char *) strdup(yytext);
+    return READ;
 }
 
 "writeln" {
     printf("WRITELN\n");
+    yylval.token = (char *) strdup(yytext);
+    return WRITELN;
 }
 
 "write" {
     printf("WRITE\n");
+    yylval.token = (char *) strdup(yytext);
+    return WRITE;
 }
 
 "in" {
     printf("IN\n");
+    yylval.token = (char *) strdup(yytext);
+    return IN;
 }
 
 "is_set" {
     printf("IS_SET\n");
+    yylval.token = (char *) strdup(yytext);
+    return IS_SET;
 }
 
 "add" {
     printf("ADD\n");
+    yylval.token = (char *) strdup(yytext);
+    return ADD;
 }
 "remove" {
     printf("REMOVE\n");
+    yylval.token = (char *) strdup(yytext);
+    return REMOVE;
 }
 "exists" {
     printf("EXISTS\n");
+    yylval.token = (char *) strdup(yytext);
+    return EXISTS;
 }
 
 "forall" {
     printf("FORALL\n");
+    yylval.token = (char *) strdup(yytext);
+    return FORALL;
 }
 "for" {
     printf("FOR\n");
+    yylval.token = (char *) strdup(yytext);
+    return FOR;
 }
 
 
@@ -154,50 +193,68 @@ QUOTES \"
 
 {EMPTY} {
     printf("EMPTY\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token= (char *) strdup(yytext);
+    return EMPTY;
 }
 
 {OP} {
     printf("OP\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return OP;
 }
 
 {ASSIGN} {
     printf("ASSIGN\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return ASSIGN;
 }
 
 {LOG} {
     printf("LOG\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return LOG;
 }
 
 {RELOP} {
     printf("RELOP\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return RELOP;
 }
 
 {ID} {
     printf("ID\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    return ID;
 }
 
 "," {
    printf(",\n");
+   return yytext[0];
 }
 
 ";" {
     printf(";\n");
+    return yytext[0];
 }
 
 "(" {
     printf("(\n");
+    return yytext[0];
 }
 
 ")" {
     printf(")\n");
+    return yytext[0];
 }
 
 "{" {
     printf("{\n");
+    return yytext[0];
 }
 
 "}" {
     printf("}\n");
+    return yytext[0];
 }
 
 "/r" {}
@@ -215,21 +272,8 @@ void yyerror(const char* msg) {
 }
 
 void lexical_error_unrecognizable_symbol(char* symbol){
-    char *error = (char *)malloc((strlen(symbol) + 1 + 35) * sizeof(char)); // +1 for the null-terminator and 35 for lex error message
+    char *error = (char *)malloc((strlen(symbol) + 1 + 35) * sizeof(char));
     sprintf(error, "lexical error, unrecognizable symbol %s", symbol);
     yyerror(error);
     free(error);
-}
- 
-int main(int argc, char **argv) {
-    if(argc > 1) {
-        yyin = fopen(argv[1], "r");
-    }
-    else {
-        yyin = stdin;
-    }
-    
-    yylex();
-    fclose(yyin);
-    yylex_destroy();
 }
