@@ -56,22 +56,21 @@ extern int yydebug;
     IF = 266,
     ELSE = 267,
     RETURN = 268,
-    PRINTF = 269,
-    FOR = 270,
-    FORALL = 271,
-    READ = 272,
-    ADD = 273,
-    REMOVE = 274,
-    IN = 275,
-    WRITE = 276,
-    WRITELN = 277,
-    EXISTS = 278,
-    IS_SET = 279,
-    QUOTES = 280,
-    ASSIGN = 281,
-    OP = 282,
-    RELOP = 283,
-    LOG = 284
+    FOR = 269,
+    FORALL = 270,
+    READ = 271,
+    ADD = 272,
+    REMOVE = 273,
+    IN = 274,
+    WRITE = 275,
+    WRITELN = 276,
+    EXISTS = 277,
+    IS_SET = 278,
+    QUOTES = 279,
+    ASSIGN = 280,
+    OP = 281,
+    RELOP = 282,
+    LOG = 283
   };
 #endif
 
@@ -85,7 +84,7 @@ union YYSTYPE
     char* token;
     struct node* node;
 
-#line 89 "parser.tab.h" /* yacc.c:1909  */
+#line 88 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

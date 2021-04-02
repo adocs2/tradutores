@@ -111,11 +111,6 @@ QUOTES \"
     yylval.token = (char *) strdup(yytext);
     return RETURN;
 }
-"printf" {
-    printf("PRINT\n");
-    yylval.token = (char *) strdup(yytext);
-    return PRINTF;
-}
 
 "read" {
     printf("READ\n");

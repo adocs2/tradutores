@@ -4,5 +4,6 @@ int main () {
            acc = acc + x;
            acce = acc + x;
         }
+        writeln(acce);
      }
 }

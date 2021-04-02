@@ -80,7 +80,7 @@ void free_symbol_table();
     struct node* node;
 }
 
-%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN PRINTF FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES
+%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES
 
 %right <token> ASSIGN
 
@@ -206,12 +206,6 @@ stmt:
     | read-stmt {
         $$ = $1; 
     }
-    | PRINTF '(' QUOTES string QUOTES ')' ';' { 
-        $$ = insert_node("PRINTF_STATEMENT", $4, NULL, "void", $1);
-    }
-    | PRINTF '(' var ')' ';' { 
-        $$ = insert_node("PRINTF_STATEMENT", $3, NULL, "void", $1); 
-    }
 ;
 
 expr:
@@ -273,11 +267,17 @@ write-stmt:
     WRITE '(' QUOTES string QUOTES ')' ';' {
         $$ = insert_node("WRITE_STATEMENT", $4, NULL, NULL, $1);
     }
+    | WRITE '(' var ')' ';' { 
+        $$ = insert_node("WRITE_STATEMENT", $3, NULL, "void", $1); 
+    }
 ;
 
 writeln-stmt: 
     WRITELN '(' QUOTES string QUOTES ')' ';' {
         $$ = insert_node("WRITELN_STATEMENT", $4, NULL, NULL, $1);
+    }
+     | WRITELN '(' var ')' ';' { 
+        $$ = insert_node("WRITELN_STATEMENT", $3, NULL, "void", $1); 
     }
 ;
 
