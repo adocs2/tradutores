@@ -9,37 +9,6 @@
 #include "utstack.h"
 #include "utstring.h"
 
-#define DECLARATION_LIST 1
-#define VARIABLE 2
-#define VARIABLE_DECLARATION 3
-#define FUNCTION 4
-#define PARAMETER 5
-#define COMPOUND_STATEMENT 6
-#define STATEMENT_LIST 7
-#define ASSIGN_EXPRESSION 8
-#define ARITHIMETIC_EXPRESSION 9
-#define RELATIONAL_EXPRESSION 10
-#define LOGICAL_EXPRESSION 11
-#define RETURN_STATEMENT 12
-#define ITERATION_STATEMENT 13
-#define CONDITIONAL_STATEMENT 14
-#define INTEGER 15
-#define FLOATNUMBER 16
-#define PRINTF_STATEMENT 17
-#define STRING 18
-#define FUNCTION_CALL 19
-#define ARGS_LIST 20
-#define ADD_STATEMENT 21
-#define REMOVE_STATEMENT 22
-#define READ_STATEMENT 23
-#define WRITE_STATEMENT 24
-#define WRITELN_STATEMENT 25
-#define IN_STATEMENT 26
-#define EXISTS_STATEMENT 27
-#define IS_SET_STATEMENT 28
-#define EMPTY_VALUE 29
-#define LOCAL_DECLARATION_LIST 30
-
 int yylex();
 extern int yylex_destroy(void);
 extern int total_errors;
@@ -51,7 +20,7 @@ extern FILE *yyin;
 
 
 typedef struct node {
-    int node_class;  
+    char* node_class;  
     struct node* left;
     struct node* right;
     char* type;
@@ -92,13 +61,12 @@ typedef struct symbol_node {
 symbol_node *symbol_table = NULL;
 
 void init_scope_global();
-node* insert_node(int node_class, node* left, node* right, char* type, char* value);
+node* insert_node(char* node_class, node* left, node* right, char* type, char* value);
 symbol_node* create_symbol(char* key, char *name, char* type, char symbol_type, char* scope_name);
 void add_symbol(char *name, char* type, char symbol_type);
 void push_stack(char* scope_name, char* type);
 void pop_stack();
 char* concat_string(const char *s1, const char *s2);
-void print_class(int node_class);
 void print_parser_tree(node * tree, int depth);
 void print_depth(int depth);
 void free_parser_tree(struct node* no);
@@ -131,13 +99,13 @@ program:
 
 declaration-list:
     declaration-list variable-declaration { 
-        $$ = insert_node(DECLARATION_LIST, $1, $2, NULL, NULL);
+        $$ = insert_node("DECLARATION_LIST", $1, $2, NULL, NULL);
     }
     | variable-declaration { 
         $$ = $1;
     }
      | declaration-list function { 
-        $$ = insert_node(DECLARATION_LIST, $1, $2, NULL, NULL);
+        $$ = insert_node("DECLARATION_LIST", $1, $2, NULL, NULL);
     }
     | function { 
         $$ = $1;
@@ -146,7 +114,7 @@ declaration-list:
 
 variable-declaration:
     TYPE ID ';' { 
-        $$ = insert_node(VARIABLE_DECLARATION, NULL, NULL, $1, $2);
+        $$ = insert_node("VARIABLE_DECLARATION", NULL, NULL, $1, $2);
         add_symbol($2, $1, 'V');
     }
 ;
@@ -157,7 +125,7 @@ function:
         push_stack($2, $1);
     }
     '(' params-list ')' compound-stmt { 
-        $$ = insert_node(FUNCTION, $5, $7, $1, $2);
+        $$ = insert_node("FUNCTION", $5, $7, $1, $2);
         pop_stack();
     }
 ;
@@ -173,24 +141,24 @@ params-list:
 
 params:
     params ',' TYPE ID { 
-        $$ = insert_node(PARAMETER, $1, NULL, $3, $4);
+        $$ = insert_node("PARAMETER", $1, NULL, $3, $4);
         add_symbol($4, $3, 'P');
     }
     | TYPE ID { 
-        $$ = insert_node(PARAMETER, NULL, NULL, $1, $2);
+        $$ = insert_node("PARAMETER", NULL, NULL, $1, $2);
         add_symbol($2, $1, 'P');
     }
 ;
 
 compound-stmt:
     '{' local_declaration stmt-list '}' { 
-        $$ = insert_node(COMPOUND_STATEMENT, $2, $3, NULL, NULL);
+        $$ = insert_node("COMPOUND_STATEMENT", $2, $3, NULL, NULL);
     }
 ;
 
 local_declaration:
     local_declaration variable-declaration { 
-        $$ = insert_node(LOCAL_DECLARATION_LIST, $1, $2, NULL, NULL);
+        $$ = insert_node("LOCAL_DECLARATION_LIST", $1, $2, NULL, NULL);
     }
     | { 
         $$ = NULL; 
@@ -199,7 +167,7 @@ local_declaration:
 
 stmt-list:
     stmt-list stmt { 
-        $$ = insert_node(STATEMENT_LIST, $1, $2, NULL, NULL);
+        $$ = insert_node("STATEMENT_LIST", $1, $2, NULL, NULL);
     }
     | { 
         $$ = NULL; 
@@ -239,16 +207,16 @@ stmt:
         $$ = $1; 
     }
     | PRINTF '(' QUOTES string QUOTES ')' ';' { 
-        $$ = insert_node(PRINTF_STATEMENT, $4, NULL, "void", $1);
+        $$ = insert_node("PRINTF_STATEMENT", $4, NULL, "void", $1);
     }
     | PRINTF '(' var ')' ';' { 
-        $$ = insert_node(PRINTF_STATEMENT, $3, NULL, "void", $1); 
+        $$ = insert_node("PRINTF_STATEMENT", $3, NULL, "void", $1); 
     }
 ;
 
 expr:
     var ASSIGN expr { 
-        $$ = insert_node(ASSIGN_EXPRESSION, $1, $3, NULL, $2);
+        $$ = insert_node("ASSIGN_EXPRESSION", $1, $3, NULL, $2);
     }
     | simple-expr ';' { 
         $$ = $1; 
@@ -257,7 +225,7 @@ expr:
 // revisar is_set
 simple-expr:
     op-expr RELOP op-expr { 
-        $$ = insert_node(RELATIONAL_EXPRESSION, $1, $3, NULL, $2);
+        $$ = insert_node("RELATIONAL_EXPRESSION", $1, $3, NULL, $2);
     }
     | op-expr { 
         $$ = $1; 
@@ -266,7 +234,7 @@ simple-expr:
         $$ = $1; 
     }
     | LOG is-set-stmt {
-        $$ = insert_node(LOGICAL_EXPRESSION, $2, NULL, NULL, $1);
+        $$ = insert_node("LOGICAL_EXPRESSION", $2, NULL, NULL, $1);
     }
 ;
 // revisar
@@ -279,16 +247,16 @@ add-stmt:
 // revisar
 remove-stmt:
     REMOVE '(' exists-stmt IN var ')'';' {
-        $$ = insert_node(REMOVE_STATEMENT, $3, $5, NULL, $1);
+        $$ = insert_node("REMOVE_STATEMENT", $3, $5, NULL, $1);
     }
 ;
 // revisar
 exists-stmt:
     '('EXISTS '(' in-stmt')'')' {
-        $$ = insert_node(EXISTS_STATEMENT, $4, NULL, NULL, $2);
+        $$ = insert_node("EXISTS_STATEMENT", $4, NULL, NULL, $2);
     }
     | EXISTS '(' in-stmt')'';' {
-        $$ = insert_node(EXISTS_STATEMENT, $3, NULL, NULL, $1);
+        $$ = insert_node("EXISTS_STATEMENT", $3, NULL, NULL, $1);
     }
     | var {
         $$ = $1;
@@ -297,78 +265,78 @@ exists-stmt:
 // revisar
 in-stmt: 
     var IN var {
-        $$ = insert_node(IN_STATEMENT, $1, $3, NULL, $2);
+        $$ = insert_node("IN_STATEMENT", $1, $3, NULL, $2);
     }
 ;
 
 write-stmt: 
     WRITE '(' QUOTES string QUOTES ')' ';' {
-        $$ = insert_node(WRITE_STATEMENT, $4, NULL, NULL, $1);
+        $$ = insert_node("WRITE_STATEMENT", $4, NULL, NULL, $1);
     }
 ;
 
 writeln-stmt: 
     WRITELN '(' QUOTES string QUOTES ')' ';' {
-        $$ = insert_node(WRITELN_STATEMENT, $4, NULL, NULL, $1);
+        $$ = insert_node("WRITELN_STATEMENT", $4, NULL, NULL, $1);
     }
 ;
 
 is-set-stmt:
     IS_SET '(' var ')'';' {
-        $$ = insert_node(IS_SET_STATEMENT, $3, NULL, NULL, $1);
+        $$ = insert_node("IS_SET_STATEMENT", $3, NULL, NULL, $1);
     }
     | IS_SET '(' var ')' {
-        $$ = insert_node(IS_SET_STATEMENT, $3, NULL, NULL, $1);
+        $$ = insert_node("IS_SET_STATEMENT", $3, NULL, NULL, $1);
     }
 ;
 
 read-stmt: 
     READ '(' var ')' ';' {
-        $$ = insert_node(READ_STATEMENT, $3, NULL, NULL, $1);
+        $$ = insert_node("READ_STATEMENT", $3, NULL, NULL, $1);
     }
 ;
 
 conditional-stmt:
     IF '(' simple-expr ')' compound-stmt { 
-        $$ = insert_node(CONDITIONAL_STATEMENT, $3, $5, NULL, $1);
+        $$ = insert_node("CONDITIONAL_STATEMENT", $3, $5, NULL, $1);
     }
     | IF '(' simple-expr ')' compound-stmt ELSE compound-stmt {
-        node* aux_node = insert_node(CONDITIONAL_STATEMENT, $5, $7, NULL, $6);
-        $$ = insert_node(CONDITIONAL_STATEMENT, $3, aux_node, NULL, $1);
+        node* aux_node = insert_node("CONDITIONAL_STATEMENT", $5, $7, NULL, $6);
+        $$ = insert_node("CONDITIONAL_STATEMENT", $3, aux_node, NULL, $1);
     }
 ;
 
 iteration-stmt:
     FORALL '(' in-stmt ')' stmt-list { 
-        $$ = insert_node(ITERATION_STATEMENT, $3, $5, NULL, $1);
+        $$ = insert_node("ITERATION_STATEMENT", $3, $5, NULL, $1);
     }
     |
     FORALL '(' in-stmt ')' compound-stmt { 
-        $$ = insert_node(ITERATION_STATEMENT, $3, $5, NULL, $1);
+        $$ = insert_node("ITERATION_STATEMENT", $3, $5, NULL, $1);
     }
 ;
 
 return-stmt:
     RETURN simple-expr ';' { 
-        $$ = insert_node(RETURN_STATEMENT, $2, NULL, NULL, $1); 
+        $$ = insert_node("RETURN_STATEMENT", $2, NULL, NULL, $1); 
     }
     | RETURN ';' { 
-        $$ = insert_node(RETURN_STATEMENT, NULL, NULL, "void", $1); 
+        $$ = insert_node("RETURN_STATEMENT", NULL, NULL, "void", $1); 
     }
 ;
 
 var:
     ID { 
-        $$ = insert_node(VARIABLE, NULL, NULL, NULL, $1);
+        $$ = insert_node("VARIABLE", NULL, NULL, NULL, $1);
     }
 ;
 
 op-expr:
     op-expr OP term {
-        $$ = insert_node(ARITHIMETIC_EXPRESSION, $1, $3, NULL, $2);
+        $$ = insert_node("ARITHIMETIC_EXPRESSION", $1, $3, NULL, $2);
     }
     | op-expr LOG term { 
-        $$ = insert_node(LOGICAL_EXPRESSION, $1, $3, NULL, $2); 
+        $$ = insert_node("LOGICAL_EXPRESSION", $1, $3, NULL, $2); 
     }
     | term { 
         $$ = $1; 
@@ -389,25 +357,25 @@ term:
         $$ = $2; 
     }
     | INT { 
-        $$ = insert_node(INTEGER, NULL, NULL, "int", $1); 
+        $$ = insert_node("INTEGER", NULL, NULL, "int", $1); 
     }
     | FLOAT { 
-        $$ = insert_node(FLOATNUMBER, NULL, NULL, "float", $1); 
+        $$ = insert_node("FLOATNUMBER", NULL, NULL, "float", $1); 
     }
     | ELEM { 
-        $$ = insert_node(FLOATNUMBER, NULL, NULL, "elem", $1); 
+        $$ = insert_node("FLOATNUMBER", NULL, NULL, "elem", $1); 
     }
     | SET { 
-        $$ = insert_node(FLOATNUMBER, NULL, NULL, "set", $1); 
+        $$ = insert_node("FLOATNUMBER", NULL, NULL, "set", $1); 
     }
     | EMPTY { 
-        $$ = insert_node(EMPTY_VALUE, NULL, NULL, "empty", $1); 
+        $$ = insert_node("EMPTY_VALUE", NULL, NULL, "empty", $1); 
     }
 ;
 
 call:
     ID '(' args ')' {
-        $$ = insert_node(FUNCTION_CALL, $3, NULL, NULL, $1);
+        $$ = insert_node("FUNCTION_CALL", $3, NULL, NULL, $1);
     }
 ;
 
@@ -422,7 +390,7 @@ args:
 
 arg-list:
     simple-expr ',' arg-list { 
-        $$ = insert_node(ARGS_LIST, $1, $3, NULL, NULL); 
+        $$ = insert_node("ARGS_LIST", $1, $3, NULL, NULL); 
     }
     | simple-expr { 
         $$ = $1; 
@@ -431,7 +399,7 @@ arg-list:
 
 string: 
     string STR { 
-        $$ = insert_node(STRING, $1, NULL, "string", $2); 
+        $$ = insert_node("STRING", $1, NULL, "string", $2); 
     }
     | { 
         $$ = NULL; 
@@ -529,7 +497,7 @@ symbol_node* create_symbol(char* key, char *name, char* type, char symbol_type, 
 }
 
 // cria node auxiliar para adicionar na parser tree nas regras
-node* insert_node(int node_class, node* left, node* right, char* type, char* value){
+node* insert_node(char* node_class, node* left, node* right, char* type, char* value){
     node* aux_node = (node*)calloc(1, sizeof(node));
 
     aux_node->node_class = node_class;
@@ -539,103 +507,6 @@ node* insert_node(int node_class, node* left, node* right, char* type, char* val
     aux_node->value = value;
 
     return aux_node;
-}
-
-// printa classes dos nodes
-void print_class(int node_class){
-    switch(node_class){
-        case DECLARATION_LIST:
-            printf("DECLARATION_LIST");
-        break;
-        case VARIABLE:
-            printf("VARIABLE");
-        break;
-        case VARIABLE_DECLARATION:
-            printf("VARIABLE_DECLARATION");
-        break;
-        case FUNCTION:
-            printf("FUNCTION_DECLARATION");
-        break;
-        case PARAMETER:
-            printf("PARAMETER");
-        break;
-        case COMPOUND_STATEMENT:
-            printf("COMPOUND_STATEMENT");
-        break;
-        case STATEMENT_LIST:
-            printf("STATEMENT_LIST");
-        break;
-        case ASSIGN_EXPRESSION:
-            printf("ASSIGN");
-        break;
-        case ARITHIMETIC_EXPRESSION:
-            printf("ARITHIMETIC_EXPRESSION");
-        break;
-        case RELATIONAL_EXPRESSION:
-            printf("RELATIONAL_EXPRESSION");
-        break;
-        case LOGICAL_EXPRESSION:
-            printf("LOGICAL_EXPRESSION");
-        break;
-        case RETURN_STATEMENT:
-            printf("RETURN");
-        break;
-        case ITERATION_STATEMENT:
-            printf("ITERATION");
-        break;
-        case CONDITIONAL_STATEMENT:
-            printf("CONDITIONAL");
-        break;
-        case INTEGER:
-            printf("INT");
-        break;
-        case FLOATNUMBER:
-            printf("FLOAT");
-        break;
-        case PRINTF_STATEMENT:
-            printf("PRINT");
-        break;
-        case STRING:
-            printf("STRING");
-        break;
-        case FUNCTION_CALL:
-            printf("FUNCTION_CALL");
-        break;
-        case ARGS_LIST:
-            printf("ARGS_LIST");
-        break;
-        case ADD_STATEMENT:
-            printf("ADD_STATEMENT");
-        break;
-        case REMOVE_STATEMENT:
-            printf("REMOVE_STATEMENT");
-        break;
-        case READ_STATEMENT:
-            printf("READ_STATEMENT");
-        break;
-        case WRITE_STATEMENT:
-            printf("WRITE_STATEMENT");
-        break;
-        case WRITELN_STATEMENT:
-            printf("WRITELN_STATEMENT");
-        break;
-        case IN_STATEMENT:
-            printf("IN_STATEMENT");
-        break;
-        case EXISTS_STATEMENT:
-            printf("EXISTS_STATEMENT");
-        break;
-        case IS_SET_STATEMENT:
-            printf("IS_SET_STATEMENT");
-        break;
-        case EMPTY_VALUE:
-            printf("EMPTY_VALUE");
-        break;
-        case LOCAL_DECLARATION_LIST:
-            printf("LOCAL_DECLARATION_LIST");
-        break;
-    }
-    printf(" ( ");
 }
 
 // printa table
@@ -685,14 +556,14 @@ void print_depth(int depth) {
 void print_parser_tree(node * tree, int depth) {
     if (tree) {
         print_depth(depth);
-        print_class(tree->node_class);
+        printf(" Class: %s, ", tree->node_class);
         if (tree->type != NULL){
             printf("type: %s && ", tree->type);
         }
         if (tree->value != NULL){
             printf("value: %s", tree->value);
         }
-        printf(")\n");
+        printf("\n");
         print_parser_tree(tree->left, depth + 1);
         print_parser_tree(tree->right, depth + 1);
     }
