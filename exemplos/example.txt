@@ -5,5 +5,7 @@ int main () {
            acce = acc + x;
         }
         writeln(acce);
+        writeln('a');
+        writeln("opa");
      }
 }

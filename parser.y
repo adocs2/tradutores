@@ -80,14 +80,14 @@ void free_symbol_table();
     struct node* node;
 }
 
-%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES
+%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES CHAR
 
 %right <token> ASSIGN
 
 %left <token> OP RELOP LOG
 
 %type <node> program declaration-list variable-declaration function params-list compound-stmt params local_declaration stmt-list stmt expr simple-expr conditional-stmt
-             iteration-stmt return-stmt add-stmt remove-stmt exists-stmt write-stmt writeln-stmt read-stmt var op-expr is-set-stmt in-stmt term call args arg-list string 
+             iteration-stmt return-stmt add-stmt remove-stmt exists-stmt write-stmt writeln-stmt read-stmt var op-expr is-set-stmt in-stmt term call args arg-list string char
 
 %%
 program:
@@ -264,8 +264,11 @@ in-stmt:
 ;
 
 write-stmt: 
-    WRITE '(' QUOTES string QUOTES ')' ';' {
-        $$ = insert_node("WRITE_STATEMENT", $4, NULL, NULL, $1);
+    WRITE '(' string  ')' ';' {
+        $$ = insert_node("WRITE_STATEMENT", $3, NULL, NULL, $1);
+    }
+    | WRITE '(' char  ')' ';' {
+        $$ = insert_node("WRITE_STATEMENT", $3, NULL, NULL, $1);
     }
     | WRITE '(' var ')' ';' { 
         $$ = insert_node("WRITE_STATEMENT", $3, NULL, "void", $1); 
@@ -273,10 +276,13 @@ write-stmt:
 ;
 
 writeln-stmt: 
-    WRITELN '(' QUOTES string QUOTES ')' ';' {
-        $$ = insert_node("WRITELN_STATEMENT", $4, NULL, NULL, $1);
+    WRITELN '('  string  ')' ';' {
+        $$ = insert_node("WRITELN_STATEMENT", $3, NULL, NULL, $1);
     }
-     | WRITELN '(' var ')' ';' { 
+    | WRITELN '('  char  ')' ';' {
+        $$ = insert_node("WRITELN_STATEMENT", $3, NULL, NULL, $1);
+    }
+    | WRITELN '(' var ')' ';' { 
         $$ = insert_node("WRITELN_STATEMENT", $3, NULL, "void", $1); 
     }
 ;
@@ -353,8 +359,11 @@ term:
     | call { 
         $$ = $1; 
     }
-    | QUOTES string QUOTES { 
-        $$ = $2; 
+    |  string  { 
+        $$ = $1; 
+    }
+    | char { 
+        $$ = $1; 
     }
     | INT { 
         $$ = insert_node("INTEGER", NULL, NULL, "int", $1); 
@@ -397,6 +406,15 @@ arg-list:
     }
 ;
 
+char: 
+    char CHAR { 
+        $$ = insert_node("STRING", $1, NULL, "char", $2); 
+    }
+    | { 
+        $$ = NULL; 
+    }
+;
+
 string: 
     string STR { 
         $$ = insert_node("STRING", $1, NULL, "string", $2); 
@@ -404,7 +422,7 @@ string:
     | { 
         $$ = NULL; 
     }
-
+;
 %%
 
 // Inicializa o escopo global

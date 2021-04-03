@@ -31,10 +31,10 @@ DIGIT [0-9]
 
 INT "-"?{DIGIT}+
 FLOAT "-"?{DIGIT}+"."({DIGIT}*)?
-%s STRING
-STR [^\"]*
 TYPE "int"|"float"|"set"|"elem"
 EMPTY EMPTY
+STRING			(\"([^(\"\')])*\")
+CHAR			(\'([^(\"\')])+\')
 
 OP "+"|"-"|"*"|"/"
 ASSIGN "="
@@ -55,29 +55,23 @@ QUOTES \"
 
 {WHITESPACE} { }
 
-<INITIAL,STRING>{QUOTES} {
-    if(inside_string) { 
-        BEGIN(0);
-        inside_string--;
-        // printf("%s%s\n", yytext, closeParenthesis);
-        return QUOTES;
-    }
-    else { 
-        BEGIN(STRING);
-        inside_string++;
-        // printf("STRING\t\t%s%s", openParenthesis, yytext);
-        return QUOTES;
-    }
-}
 
-
-<STRING>{STR} { 
+{STRING} { 
     if(strcmp(yytext, "\n") == 0){line++;} 
-    // printf("%s", yytext);
+    printf("%s", yytext);
     yylval.token = (char *) strdup(yytext);
     return STR; 
+}
+
+{CHAR} { 
+    if(strcmp(yytext, "\n") == 0){line++;} 
+    printf("%s", yytext);
+    yylval.token = (char *) strdup(yytext);
+    return CHAR; 
 
 }
+
+
 {INT} {
     printf("INT\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);

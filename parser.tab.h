@@ -67,10 +67,11 @@ extern int yydebug;
     EXISTS = 277,
     IS_SET = 278,
     QUOTES = 279,
-    ASSIGN = 280,
-    OP = 281,
-    RELOP = 282,
-    LOG = 283
+    CHAR = 280,
+    ASSIGN = 281,
+    OP = 282,
+    RELOP = 283,
+    LOG = 284
   };
 #endif
 
@@ -84,7 +85,7 @@ union YYSTYPE
     char* token;
     struct node* node;
 
-#line 88 "parser.tab.h" /* yacc.c:1909  */
+#line 89 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
