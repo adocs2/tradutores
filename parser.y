@@ -230,35 +230,37 @@ simple-expr:
     | LOG is-set-stmt {
         $$ = insert_node("LOGICAL_EXPRESSION", $2, NULL, NULL, $1);
     }
+    | add-stmt {
+        $$ = $1; 
+    }
+    | remove-stmt {
+        $$ = $1; 
+    }
+    | exists-stmt {
+        $$ = $1; 
+    }
 ;
 // revisar
 add-stmt:
-    add-stmt '(' op-expr IN add-stmt ')' {
-    }
-    | ADD {
+    ADD '(' in-stmt ')' {
+        $$ = insert_node("ADD_STATEMENT", $3, NULL, NULL, $1);
     }
 ;
 // revisar
 remove-stmt:
-    REMOVE '(' exists-stmt IN var ')'';' {
-        $$ = insert_node("REMOVE_STATEMENT", $3, $5, NULL, $1);
+    REMOVE '(' in-stmt ')' {
+        $$ = insert_node("REMOVE_STATEMENT", $3, NULL, NULL, $1);
     }
 ;
 // revisar
 exists-stmt:
-    '('EXISTS '(' in-stmt')'')' {
-        $$ = insert_node("EXISTS_STATEMENT", $4, NULL, NULL, $2);
-    }
-    | EXISTS '(' in-stmt')'';' {
+    EXISTS '(' in-stmt')' {
         $$ = insert_node("EXISTS_STATEMENT", $3, NULL, NULL, $1);
-    }
-    | var {
-        $$ = $1;
     }
 ;
 // revisar
 in-stmt: 
-    var IN var {
+    simple-expr IN simple-expr {
         $$ = insert_node("IN_STATEMENT", $1, $3, NULL, $2);
     }
 ;
@@ -288,10 +290,7 @@ writeln-stmt:
 ;
 
 is-set-stmt:
-    IS_SET '(' var ')'';' {
-        $$ = insert_node("IS_SET_STATEMENT", $3, NULL, NULL, $1);
-    }
-    | IS_SET '(' var ')' {
+    IS_SET '(' var ')' {
         $$ = insert_node("IS_SET_STATEMENT", $3, NULL, NULL, $1);
     }
 ;

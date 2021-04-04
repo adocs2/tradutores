@@ -10,6 +10,7 @@
 char openParenthesis[] = "(";
 char closeParenthesis[] = ")";
 int line = 1;
+int column = 0;
 int inside_string = 0;
 int total_errors = 0;
 
@@ -51,15 +52,17 @@ QUOTES \"
 %%
 {EOL} {
     line++;
+    column += strlen(yytext);
 }
 
-{WHITESPACE} { }
+{WHITESPACE} { column += strlen(yytext); }
 
 
 {STRING} { 
     if(strcmp(yytext, "\n") == 0){line++;} 
     printf("%s", yytext);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return STR; 
 }
 
@@ -67,6 +70,7 @@ QUOTES \"
     if(strcmp(yytext, "\n") == 0){line++;} 
     printf("%s", yytext);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return CHAR; 
 
 }
@@ -75,97 +79,114 @@ QUOTES \"
 {INT} {
     printf("INT\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return INT; 
 }
 
 {FLOAT} {
     printf("FLOAT\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return FLOAT; 
 }
 
 {TYPE} {
     printf("TYPE\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return TYPE;
 }
 
 "if" {
     printf("IF\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return IF;
 }
 "else" {
     printf("ELSE\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return ELSE;
 }
 "return" {
     printf("RETURN\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return RETURN;
 }
 
 "read" {
     printf("READ\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return READ;
 }
 
 "writeln" {
     printf("WRITELN\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return WRITELN;
 }
 
 "write" {
     printf("WRITE\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return WRITE;
 }
 
 "in" {
     printf("IN\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return IN;
 }
 
 "is_set" {
     printf("IS_SET\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return IS_SET;
 }
 
 "add" {
     printf("ADD\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return ADD;
 }
 "remove" {
     printf("REMOVE\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return REMOVE;
 }
 "exists" {
     printf("EXISTS\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return EXISTS;
 }
 
 "forall" {
     printf("FORALL\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return FORALL;
 }
 "for" {
     printf("FOR\n");
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return FOR;
 }
 
 
 "/*" {
     BEGIN(COMMENT);
+    column += strlen(yytext);
 }
 
 "//".*  {
@@ -174,75 +195,88 @@ QUOTES \"
 
 <COMMENT>"*/" {
     BEGIN(INITIAL);
+    column += strlen(yytext);
 }
 
-<COMMENT>\n {line++;}
+<COMMENT>\n {line++;column += strlen(yytext);}
 
 <COMMENT>. { }
 
 {EMPTY} {
     printf("EMPTY\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token= (char *) strdup(yytext);
+    column += strlen(yytext);
     return EMPTY;
 }
 
 {OP} {
     printf("OP\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return OP;
 }
 
 {ASSIGN} {
     printf("ASSIGN\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return ASSIGN;
 }
 
 {LOG} {
     printf("LOG\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return LOG;
 }
 
 {RELOP} {
     printf("RELOP\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return RELOP;
 }
 
 {ID} {
     printf("ID\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
     return ID;
 }
 
 "," {
    printf(",\n");
+   column += strlen(yytext);
    return yytext[0];
 }
 
 ";" {
     printf(";\n");
+    column += strlen(yytext);
     return yytext[0];
 }
 
 "(" {
     printf("(\n");
+    column += strlen(yytext);
     return yytext[0];
 }
 
 ")" {
     printf(")\n");
+    column += strlen(yytext);
     return yytext[0];
 }
 
 "{" {
     printf("{\n");
+    column += strlen(yytext);
     return yytext[0];
 }
 
 "}" {
     printf("}\n");
+    column += strlen(yytext);
     return yytext[0];
 }
 
@@ -256,7 +290,7 @@ QUOTES \"
   
 %%
 void yyerror(const char* msg) {
-    fprintf(stderr, "\n%s -- linha: %d\n", msg, line);
+    fprintf(stderr, "\n%s -- linha: %d, coluna: %d\n", msg, line, column);
     total_errors++;
 }
 
