@@ -174,7 +174,6 @@ stmt-list:
     }
 ;
 
-// revisar
 stmt: 
     expr { 
         $$ = $1; 
@@ -216,7 +215,6 @@ expr:
         $$ = $1; 
     }
 ;
-// revisar is_set
 simple-expr:
     op-expr RELOP op-expr { 
         $$ = insert_node("RELATIONAL_EXPRESSION", $1, $3, NULL, $2);
@@ -240,25 +238,21 @@ simple-expr:
         $$ = $1; 
     }
 ;
-// revisar
 add-stmt:
     ADD '(' in-stmt ')' {
         $$ = insert_node("ADD_STATEMENT", $3, NULL, NULL, $1);
     }
 ;
-// revisar
 remove-stmt:
     REMOVE '(' in-stmt ')' {
         $$ = insert_node("REMOVE_STATEMENT", $3, NULL, NULL, $1);
     }
 ;
-// revisar
 exists-stmt:
     EXISTS '(' in-stmt')' {
         $$ = insert_node("EXISTS_STATEMENT", $3, NULL, NULL, $1);
     }
 ;
-// revisar
 in-stmt: 
     simple-expr IN simple-expr {
         $$ = insert_node("IN_STATEMENT", $1, $3, NULL, $2);
