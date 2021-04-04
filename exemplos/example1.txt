@@ -6,6 +6,7 @@ int main () {
            acce = acc + x;
            writeln("y");
            add(2 in add(1 in s));
+           x = x+5;
         }
      }
     return 0;
