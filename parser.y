@@ -180,7 +180,7 @@ stmt:
     variable-declaration {
         $$ = $1;
     }
-    |expr { 
+    | expr { 
         $$ = $1; 
     }
     | conditional-stmt { 
