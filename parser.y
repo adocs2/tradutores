@@ -85,7 +85,7 @@ void free_symbol_table();
 %nonassoc THEN ELSE
 
 %type <node> program declaration-list variable-declaration function params-list compound-stmt params local_declaration stmt-list stmt set-func expr simple-expr conditional-stmt
-             iteration-stmt return-stmt write-stmt writeln-stmt read-stmt var op-expr in-stmt term call args arg-list string char error
+             iteration-stmt return-stmt write-stmt writeln-stmt read-stmt var op-expr in-stmt term call args arg-list  error compound-inline
 
 %%
 program:
@@ -149,6 +149,14 @@ params:
         $$ = create_tree_node("PARAMETER", NULL, NULL, $1, $2);
         add_symbol($2, $1, "parameter");
     }
+;
+
+compound-inline: compound-stmt {
+                    $$ = $1;
+                }
+                | stmt {
+                    $$ = $1;
+                }
 ;
 
 compound-stmt:
@@ -259,26 +267,26 @@ in-stmt:
 ;
 
 write-stmt: 
-    WRITE '(' string  ')' ';' {
-        $$ = create_tree_node("WRITE_STATEMENT", $3, NULL, NULL, $1);
+    WRITE '(' STR  ')' ';' {
+        $$ = create_tree_node("WRITE_STATEMENT", NULL, NULL, "string", $3);
     }
-    | WRITE '(' char  ')' ';' {
-        $$ = create_tree_node("WRITE_STATEMENT", $3, NULL, NULL, $1);
+    | WRITE '(' CHAR  ')' ';' {
+        $$ = create_tree_node("WRITE_STATEMENT", NULL, NULL, "char", $3);
     }
     | WRITE '(' var ')' ';' { 
-        $$ = create_tree_node("WRITE_STATEMENT", $3, NULL, "void", $1); 
+        $$ = create_tree_node("WRITE_STATEMENT", $3, NULL, $3->type, $1); 
     }
 ;
 
 writeln-stmt: 
-    WRITELN '('  string  ')' ';' {
-        $$ = create_tree_node("WRITELN_STATEMENT", $3, NULL, NULL, $1);
+    WRITELN '('  STR  ')' ';' {
+        $$ = create_tree_node("WRITELN_STATEMENT", NULL, NULL, "string", $3);
     }
-    | WRITELN '('  char  ')' ';' {
-        $$ = create_tree_node("WRITELN_STATEMENT", $3, NULL, NULL, $1);
+    | WRITELN '('  CHAR  ')' ';' {
+        $$ = create_tree_node("WRITELN_STATEMENT", NULL, NULL, "char", $3);
     }
     | WRITELN '(' var ')' ';' { 
-        $$ = create_tree_node("WRITELN_STATEMENT", $3, NULL, "void", $1); 
+        $$ = create_tree_node("WRITELN_STATEMENT", $3, NULL, $3->type, $1); 
     }
 ;
 
@@ -289,31 +297,17 @@ read-stmt:
 ;
 
 conditional-stmt:
-    IF '(' simple-expr ')' compound-stmt %prec THEN { 
+    IF '(' simple-expr ')' compound-inline %prec THEN { 
         $$ = create_tree_node("CONDITIONAL_STATEMENT", $3, $5, NULL, $1);
     }
-    | IF '(' simple-expr ')' compound-stmt ELSE compound-stmt {
-        node* aux_node = create_tree_node("CONDITIONAL_STATEMENT", $5, $7, NULL, $6);
-        $$ = create_tree_node("CONDITIONAL_STATEMENT", $3, aux_node, NULL, $1);
-    }
-    | IF '(' simple-expr ')' stmt {
-        $$ = create_tree_node("CONDITIONAL_STATEMENT", $3, $5, NULL, $1);
-    }
-    | IF '(' simple-expr ')' stmt ELSE stmt{
-        node* aux_node = create_tree_node("CONDITIONAL_STATEMENT", $5, $7, NULL, $6);
-        $$ = create_tree_node("CONDITIONAL_STATEMENT", $3, aux_node, NULL, $1);
-    }
-    | IF '(' simple-expr ')' stmt ELSE compound-stmt{
+    | IF '(' simple-expr ')' compound-inline ELSE compound-inline {
         node* aux_node = create_tree_node("CONDITIONAL_STATEMENT", $5, $7, NULL, $6);
         $$ = create_tree_node("CONDITIONAL_STATEMENT", $3, aux_node, NULL, $1);
     }
 ;
 
 iteration-stmt:
-    FORALL '(' in-stmt ')' stmt { 
-        $$ = create_tree_node("ITERATION_STATEMENT", $3, $5, NULL, $1);
-    }
-    |FORALL '(' in-stmt ')' compound-stmt { 
+    FORALL '(' in-stmt ')' compound-inline { 
         $$ = create_tree_node("ITERATION_STATEMENT", $3, $5, NULL, $1);
     }
 ;
@@ -353,12 +347,6 @@ term:
         $$ = $1; 
     }
     | call { 
-        $$ = $1; 
-    }
-    |  string  { 
-        $$ = $1; 
-    }
-    | char { 
         $$ = $1; 
     }
     | INT { 
@@ -402,23 +390,6 @@ arg-list:
     }
 ;
 
-char: 
-    char CHAR { 
-        $$ = create_tree_node("STRING", $1, NULL, "char", $2); 
-    }
-    | { 
-        $$ = NULL; 
-    }
-;
-
-string: 
-    string STR { 
-        $$ = create_tree_node("STRING", $1, NULL, "string", $2); 
-    }
-    | { 
-        $$ = NULL; 
-    }
-;
 %%
 
 // Inicializa o escopo global

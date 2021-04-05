@@ -10,5 +10,7 @@ int main () {
            x = x + 5;
         }
      }
+     forall(x in 5) writeln('x');
+     if(x in 5) writeln(u); else write(y);
     return 0;
 }

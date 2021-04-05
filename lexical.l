@@ -72,7 +72,6 @@ QUOTES \"
     yylval.token = (char *) strdup(yytext);
     column += strlen(yytext);
     return CHAR; 
-
 }
 
 
