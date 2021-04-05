@@ -81,7 +81,7 @@ void free_symbol_table();
 
 %nonassoc THEN ELSE
 
-%type <node> program declaration-list variable-declaration function params-list compound-stmt params local_declaration stmt-list stmt set-func expr simple-expr conditional-stmt
+%type <node> program declaration-list variable-declaration function params-list compound-stmt params stmt-list stmt set-func expr simple-expr conditional-stmt
              iteration-stmt return-stmt write-stmt writeln-stmt read-stmt var op-expr in-stmt term call args arg-list  error compound-inline
 
 %%
@@ -157,18 +157,8 @@ compound-inline: compound-stmt {
 ;
 
 compound-stmt:
-    '{' local_declaration stmt-list '}' { 
-        $$ = create_tree_node("COMPOUND_STATEMENT", $2, $3, NULL, NULL);
-    }
-;
-
-
-local_declaration:
-    local_declaration variable-declaration { 
-        $$ = create_tree_node("LOCAL_DECLARATION_LIST", $1, $2, NULL, NULL);
-    }
-    | { 
-        $$ = NULL; 
+    '{' stmt-list '}' { 
+        $$ = create_tree_node("COMPOUND_STATEMENT", $2, NULL , NULL, NULL);
     }
 ;
 
