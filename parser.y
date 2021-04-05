@@ -18,7 +18,6 @@ extern int lex_error;
 extern void yyerror(const char* msg);
 extern FILE *yyin;
 
-
 typedef struct node {
     char* class;  
     struct node* left;
@@ -73,8 +72,6 @@ void free_symbol_table();
     char* token;
     struct node* node;
 }
-
-
 
 %token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES CHAR THEN
 
@@ -562,6 +559,7 @@ void free_parser_tree(struct node* node){
     free(node);
 }
 
+// função de concatenar para criar chave da tabela
 char* concat_string(const char *s1, const char *s2){
     char *result = malloc(strlen(s1) + strlen(s2) + 1);
     strcpy(result, s1);
@@ -569,7 +567,6 @@ char* concat_string(const char *s1, const char *s2){
     strcat(result, s2);
     return result;
 }
-
 
 int main(int argc, char **argv) {
     if(argc > 1) {
