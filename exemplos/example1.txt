@@ -1,12 +1,13 @@
 int main () {
     int x;
+    set x;
      forall(x in s) {
         if (!is_set(x)) {
            acc = acc + x;
            acce = acc + x;
            writeln("y");
            add(2 in add(1 in s));
-           x = x+5;
+           x = x + 5;
         }
      }
     return 0;

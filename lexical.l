@@ -52,10 +52,10 @@ QUOTES \"
 %%
 {EOL} {
     line++;
-    column += strlen(yytext);
+    column = 0;
 }
 
-{WHITESPACE} { column += strlen(yytext); }
+{WHITESPACE} { }
 
 
 {STRING} { 

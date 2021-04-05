@@ -821,13 +821,13 @@ YY_RULE_SETUP
 #line 53 "lexical.l"
 {
     line++;
-    column += strlen(yytext);
+    column = 0;
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 58 "lexical.l"
-{ column += strlen(yytext); }
+{ }
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
