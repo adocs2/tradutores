@@ -1,3 +1,4 @@
+/* Afonso Dias de Oliveira Conceição Silva - 140055771 */
 %define lr.type canonical-lr
 %{
 #include <stdio.h>
@@ -65,6 +66,9 @@ void print_depth(int depth);
 void free_parser_tree(struct node* no);
 void print_symbol_table();
 void free_symbol_table();
+void semantic_error_redeclared_variable(char* name, char* scope);
+void semantic_error_not_declared_variable(char* name);
+symbol_node* search_for_symbol(char* name);
 
 %}
 
@@ -309,8 +313,13 @@ return-stmt:
 ;
 
 var:
-    ID { 
-        $$ = create_tree_node("VARIABLE", NULL, NULL, NULL, $1);
+    ID {
+        symbol_node* s = search_for_symbol($1);
+        char* type = NULL;
+        if(s != NULL){
+            type = s->type;
+        }
+        $$ = create_tree_node("VARIABLE", NULL, NULL, type, $1);
     }
 ;
 
@@ -355,7 +364,12 @@ term:
 
 call:
     ID '(' args ')' {
-        $$ = create_tree_node("FUNCTION_CALL", $3, NULL, NULL, $1);
+        symbol_node* s = search_for_symbol($1);
+        char* type = NULL;
+        if(s != NULL){
+            type = s->type;
+        }
+        $$ = create_tree_node("FUNCTION_CALL", $3, NULL, type, $1);
     }
 ;
 
@@ -428,8 +442,50 @@ void add_symbol(char* name, char* type, char* symbol_type) {
     symbol_node *s;
     scope* scope = get_stack_head();
     char *key = concat_string(name, scope->scope_name);
-    s = create_symbol(key, name, type, symbol_type, scope->scope_name);
-    HASH_ADD_STR(symbol_table, key, s);
+    HASH_FIND_STR(symbol_table, key, s);
+    if(s == NULL){ // variável não declarada, adicionar na tabela
+        s = create_symbol(key, name, type, symbol_type, scope->scope_name);
+        HASH_ADD_STR(symbol_table, key, s);
+    }
+    else{ // erro de variável redeclarada
+        semantic_error_redeclared_variable(name, scope->scope_name);
+    }
+}
+
+// Procura símbolo na tabela de símbolos
+symbol_node* search_for_symbol(char* name) {
+    symbol_node *s;
+    scope* scope = get_stack_head();
+    char *key = concat_string(name, scope->scope_name);
+    HASH_FIND_STR(symbol_table, key, s);
+    if(
+        s == NULL && 
+        (strcmp(scope->scope_name, "global") != 0)
+    ){
+        scope = stack;
+        key = concat_string(name, scope->scope_name);
+        HASH_FIND_STR(symbol_table, key, s);
+    }
+    if(s == NULL){
+        semantic_error_not_declared_variable(name);
+    }
+    return s;
+}
+
+// Erro semântico redeclaração de variável
+void semantic_error_redeclared_variable(char* name, char* scope){
+    char *error = (char *)malloc((strlen(name) + strlen(scope) + 46) * sizeof(char));
+    sprintf(error, "semantic error, %s was already declared in %s", name, scope);
+    yyerror(error);
+    free(error);
+}
+
+// Erro semântico variável não declarada
+void semantic_error_not_declared_variable(char* name){
+    char *error = (char *)malloc((strlen(name) + 36) * sizeof(char));
+    sprintf(error, "semantic error, %s was not declared", name);
+    yyerror(error);
+    free(error);
 }
 
 // cria símbolo para table

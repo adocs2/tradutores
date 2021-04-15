@@ -1,10 +1,15 @@
 int main () {
-    int x;
+    int j;
+    set s;
     set x;
+    int acce;
+    int acc;
+    int u;
+    int y;
      forall(x in s) {
         if (!is_set(x)) {
-           acc = acc + x;
-           acce = acc + x;
+           acc = acc + j;
+           acce = acc + j;
            writeln("y");
            add(2 in add(1 in s));
            x = x + 5;

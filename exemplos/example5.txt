@@ -12,4 +12,6 @@ int main () {
         writeln('a');
         writeln("opa");
      }
+    int x;
+    int s;
 }

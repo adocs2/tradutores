@@ -14,7 +14,7 @@ set subsum(set s, int target, int cur_sum, set ans) {
     }
 }
 
-int main() {
+int test1() {
     set s;
     s = EMPTY;
 
@@ -55,7 +55,7 @@ set add_set(set s) {
     //{{1,2}}
 }
 
-int main() {
+int test() {
     set s;
     s = EMPTY;
 
@@ -103,6 +103,7 @@ int main() {
 
 set copy_set(set s) {
     set ans;
+    set x;
     ans = EMPTY;
     forall(x in s) add(x in ans);
     return ans;
