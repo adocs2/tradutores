@@ -671,34 +671,34 @@ void check_semantic_error_no_main(){
 // Cria lista de argumentos a partir de um nó da árvore
 args_node* create_args_list(node* no){
     args_node* args_list = NULL;
-    args_node* arg_atual = NULL;
-    node* no_atual = no;
+    args_node* arguments = NULL;
+    node* node = no;
 
     // Monta lista de argumentos
     if(no != NULL){
-        if(strcmp(no_atual->class, "ARGS_LIST") == 0){
-            while(strcmp(no_atual->class, "ARGS_LIST") == 0){
+        if(strcmp(node->class, "ARGS_LIST") == 0){
+            while(strcmp(node->class, "ARGS_LIST") == 0){
                 args_node *a = (args_node *)malloc(sizeof *a);
-                a->name = no_atual->left->value;
-                a->type = no_atual->left->type;
+                a->name = node->left->value;
+                a->type = node->left->type;
                 a->next = NULL;
                 if(args_list == NULL){
                     args_list = a;
-                    arg_atual = args_list;
+                    arguments = args_list;
                 }
                 else{
-                    arg_atual->next = a;
-                    arg_atual = arg_atual-> next;
+                    arguments->next = a;
+                    arguments = arguments-> next;
                 }
-                if(strcmp(no_atual->right->class, "ARGS_LIST") != 0){
+                if(strcmp(node->right->class, "ARGS_LIST") != 0){
                     args_node *a = (args_node *)malloc(sizeof *a);
-                    a->name = no_atual->right->value;
-                    a->type = no_atual->right->type;
+                    a->name = node->right->value;
+                    a->type = node->right->type;
                     a->next = NULL;
-                    arg_atual->next = a;
-                    arg_atual = arg_atual-> next;
+                    arguments->next = a;
+                    arguments = arguments-> next;
                 }
-                no_atual = no_atual->right;
+                node = node->right;
             }
         }
         else{
