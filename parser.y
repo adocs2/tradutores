@@ -359,6 +359,9 @@ op-expr:
         $$ = create_tree_node("RELATIONAL_EXPRESSION", $1, $3, NULL, $2->value);
         define_type($$);
     }
+    | NOT term { 
+        $$ = create_tree_node("NOT_OP", $2, NULL, NULL, $1);
+    }
     | term { 
         $$ = $1; 
     }

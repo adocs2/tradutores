@@ -3,7 +3,7 @@ int main () {
    int s;
    int acce;
      forall(x in s) {
-        if (!is_set(x)) {
+        if (!x) {
            int acc;
            acc = acc + x;
            acce = acc + x;
