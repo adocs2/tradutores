@@ -12,7 +12,6 @@ int main () {
            acce = acc + j;
            writeln("y");
            add(2 in add(1 in s));
-           x = x + 5;
         }
      }
      forall(x in 5) writeln('x');

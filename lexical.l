@@ -10,7 +10,7 @@
 char openParenthesis[] = "(";
 char closeParenthesis[] = ")";
 int line = 1;
-int column = 0;
+int column = 1;
 int inside_string = 0;
 int total_errors = 0;
 
@@ -55,7 +55,9 @@ QUOTES \"
     column = 0;
 }
 
-{WHITESPACE} { }
+{WHITESPACE} {
+    column += strlen(yytext);
+}
 
 
 {STRING} { 

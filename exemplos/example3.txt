@@ -1,10 +1,10 @@
-int sum(int x, int y) {
+set sum(int x, int y) {
     x = x+y;
     return x;
 }
 
 int main() {
-    int %x;
+    set %x;
     int $y;
     int z;
     x = 5;

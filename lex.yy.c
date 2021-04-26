@@ -530,7 +530,7 @@ char *yytext;
 char openParenthesis[] = "(";
 char closeParenthesis[] = ")";
 int line = 1;
-int column = 0;
+int column = 1;
 int inside_string = 0;
 int total_errors = 0;
 
@@ -827,12 +827,14 @@ YY_RULE_SETUP
 case 2:
 YY_RULE_SETUP
 #line 58 "lexical.l"
-{ }
+{
+    column += strlen(yytext);
+}
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 61 "lexical.l"
+#line 63 "lexical.l"
 { 
     if(strcmp(yytext, "\n") == 0){line++;} 
     printf("%s", yytext);
@@ -844,7 +846,7 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 69 "lexical.l"
+#line 71 "lexical.l"
 { 
     if(strcmp(yytext, "\n") == 0){line++;} 
     printf("%s", yytext);
@@ -855,7 +857,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 78 "lexical.l"
+#line 80 "lexical.l"
 {
     printf("INT\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -865,7 +867,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 85 "lexical.l"
+#line 87 "lexical.l"
 {
     printf("FLOAT\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -875,7 +877,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 92 "lexical.l"
+#line 94 "lexical.l"
 {
     printf("TYPE\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -885,7 +887,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 99 "lexical.l"
+#line 101 "lexical.l"
 {
     printf("IF\n");
     yylval.token = (char *) strdup(yytext);
@@ -895,7 +897,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 105 "lexical.l"
+#line 107 "lexical.l"
 {
     printf("ELSE\n");
     yylval.token = (char *) strdup(yytext);
@@ -905,7 +907,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 111 "lexical.l"
+#line 113 "lexical.l"
 {
     printf("RETURN\n");
     yylval.token = (char *) strdup(yytext);
@@ -915,7 +917,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 118 "lexical.l"
+#line 120 "lexical.l"
 {
     printf("READ\n");
     yylval.token = (char *) strdup(yytext);
@@ -925,7 +927,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 125 "lexical.l"
+#line 127 "lexical.l"
 {
     printf("WRITELN\n");
     yylval.token = (char *) strdup(yytext);
@@ -935,7 +937,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 132 "lexical.l"
+#line 134 "lexical.l"
 {
     printf("WRITE\n");
     yylval.token = (char *) strdup(yytext);
@@ -945,7 +947,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 139 "lexical.l"
+#line 141 "lexical.l"
 {
     printf("IN\n");
     yylval.token = (char *) strdup(yytext);
@@ -955,7 +957,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 146 "lexical.l"
+#line 148 "lexical.l"
 {
     printf("IS_SET\n");
     yylval.token = (char *) strdup(yytext);
@@ -965,7 +967,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 153 "lexical.l"
+#line 155 "lexical.l"
 {
     printf("ADD\n");
     yylval.token = (char *) strdup(yytext);
@@ -975,7 +977,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 159 "lexical.l"
+#line 161 "lexical.l"
 {
     printf("REMOVE\n");
     yylval.token = (char *) strdup(yytext);
@@ -985,7 +987,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 165 "lexical.l"
+#line 167 "lexical.l"
 {
     printf("EXISTS\n");
     yylval.token = (char *) strdup(yytext);
@@ -995,7 +997,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 172 "lexical.l"
+#line 174 "lexical.l"
 {
     printf("FORALL\n");
     yylval.token = (char *) strdup(yytext);
@@ -1005,7 +1007,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 178 "lexical.l"
+#line 180 "lexical.l"
 {
     printf("FOR\n");
     yylval.token = (char *) strdup(yytext);
@@ -1015,7 +1017,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 186 "lexical.l"
+#line 188 "lexical.l"
 {
     BEGIN(COMMENT);
     column += strlen(yytext);
@@ -1023,14 +1025,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 191 "lexical.l"
+#line 193 "lexical.l"
 {
    
 }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 195 "lexical.l"
+#line 197 "lexical.l"
 {
     BEGIN(INITIAL);
     column += strlen(yytext);
@@ -1039,17 +1041,17 @@ YY_RULE_SETUP
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 200 "lexical.l"
+#line 202 "lexical.l"
 {line++;column += strlen(yytext);}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 202 "lexical.l"
+#line 204 "lexical.l"
 { }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 204 "lexical.l"
+#line 206 "lexical.l"
 {
     printf("EMPTY\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token= (char *) strdup(yytext);
@@ -1059,7 +1061,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 211 "lexical.l"
+#line 213 "lexical.l"
 {
     printf("OP\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -1069,7 +1071,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 218 "lexical.l"
+#line 220 "lexical.l"
 {
     printf("ASSIGN\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -1079,7 +1081,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 225 "lexical.l"
+#line 227 "lexical.l"
 {
     printf("LOG\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -1089,7 +1091,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 232 "lexical.l"
+#line 234 "lexical.l"
 {
     printf("RELOP\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -1099,7 +1101,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 239 "lexical.l"
+#line 241 "lexical.l"
 {
     printf("ID\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
@@ -1109,7 +1111,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 246 "lexical.l"
+#line 248 "lexical.l"
 {
    printf(",\n");
    column += strlen(yytext);
@@ -1118,7 +1120,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 252 "lexical.l"
+#line 254 "lexical.l"
 {
     printf(";\n");
     column += strlen(yytext);
@@ -1127,7 +1129,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 258 "lexical.l"
+#line 260 "lexical.l"
 {
     printf("(\n");
     column += strlen(yytext);
@@ -1136,7 +1138,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 264 "lexical.l"
+#line 266 "lexical.l"
 {
     printf(")\n");
     column += strlen(yytext);
@@ -1145,7 +1147,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 270 "lexical.l"
+#line 272 "lexical.l"
 {
     printf("{\n");
     column += strlen(yytext);
@@ -1154,7 +1156,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 276 "lexical.l"
+#line 278 "lexical.l"
 {
     printf("}\n");
     column += strlen(yytext);
@@ -1163,27 +1165,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 282 "lexical.l"
+#line 284 "lexical.l"
 {}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 284 "lexical.l"
+#line 286 "lexical.l"
 {}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 286 "lexical.l"
+#line 288 "lexical.l"
 {
   lexical_error_unrecognizable_symbol(yytext);
 }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 290 "lexical.l"
+#line 292 "lexical.l"
 ECHO;
 	YY_BREAK
-#line 1187 "lex.yy.c"
+#line 1189 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 	yyterminate();
@@ -2152,7 +2154,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 290 "lexical.l"
+#line 292 "lexical.l"
 
 void yyerror(const char* msg) {
     fprintf(stderr, "\n%s -- linha: %d, coluna: %d\n", msg, line, column);
