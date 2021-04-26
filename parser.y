@@ -674,7 +674,6 @@ args_node* create_args_list(node* no){
     args_node* arguments = NULL;
     node* node = no;
 
-    // Monta lista de argumentos
     if(no != NULL){
         if(strcmp(node->class, "ARGS_LIST") == 0){
             while(strcmp(node->class, "ARGS_LIST") == 0){
