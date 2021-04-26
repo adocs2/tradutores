@@ -69,10 +69,20 @@ extern int yydebug;
     QUOTES = 279,
     CHAR = 280,
     THEN = 281,
-    ASSIGN = 282,
-    OP = 283,
-    RELOP = 284,
-    LOG = 285
+    EQ = 282,
+    NE = 283,
+    LE = 284,
+    GE = 285,
+    OR = 286,
+    AND = 287,
+    NOT = 288,
+    L = 289,
+    G = 290,
+    ASSIGN = 291,
+    ADD_OP = 292,
+    SUB = 293,
+    MULT = 294,
+    DIV = 295
   };
 #endif
 
@@ -86,7 +96,7 @@ union YYSTYPE
     char* token;
     struct node* node;
 
-#line 90 "parser.tab.h" /* yacc.c:1909  */
+#line 100 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

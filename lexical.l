@@ -37,10 +37,20 @@ EMPTY EMPTY
 STRING			(\"([^(\"\')])*\")
 CHAR			(\'([^(\"\')])+\')
 
-OP "+"|"-"|"*"|"/"
+ADD_OP				("+")
+SUB				("-")
+MULT			("*")
+DIV				("/")
 ASSIGN "="
-RELOP "<="|"=="|">="|">"|"<"|"!="
-LOG "&&"|"||"|"!"
+OR			("||")
+AND			("&&")
+NOT			("!")
+EQ			("==")
+GE			(">=")
+LE			("<=")
+NE			("!=")
+G			(">")
+L			("<")
 
 ID {LETTER}({LETTER}|{DIGIT}|{UNDERSCORE})*
 
@@ -210,11 +220,95 @@ QUOTES \"
     return EMPTY;
 }
 
-{OP} {
-    printf("OP\t\t(%s) LENGTH %d\n", yytext, yyleng);
+{ADD_OP} {
+    printf("ADD_OP\t\t(%s) LENGTH %d\n", yytext, yyleng);
     yylval.token = (char *) strdup(yytext);
     column += strlen(yytext);
-    return OP;
+    return ADD_OP;
+}
+
+{SUB} {
+    printf("SUB\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return SUB;
+}
+
+{MULT} {
+    printf("MULT\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return MULT;
+}
+
+{DIV} {
+    printf("DIV\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return DIV;
+}
+
+{OR} {
+    printf("OR\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return OR;
+}
+
+{AND} {
+    printf("AND\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return AND;
+}
+
+{NOT} {
+    printf("NOT\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return NOT;
+}
+
+{EQ} {
+    printf("EQ\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return EQ;
+}
+
+{GE} {
+    printf("GE\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return GE;
+}
+
+{LE} {
+    printf("LE\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return LE;
+}
+
+{NE} {
+    printf("NE\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return NE;
+}
+
+{G} {
+    printf("G\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return G;
+}
+
+{L} {
+    printf("L\t\t(%s) LENGTH %d\n", yytext, yyleng);
+    yylval.token = (char *) strdup(yytext);
+    column += strlen(yytext);
+    return L;
 }
 
 {ASSIGN} {
@@ -222,20 +316,6 @@ QUOTES \"
     yylval.token = (char *) strdup(yytext);
     column += strlen(yytext);
     return ASSIGN;
-}
-
-{LOG} {
-    printf("LOG\t\t(%s) LENGTH %d\n", yytext, yyleng);
-    yylval.token = (char *) strdup(yytext);
-    column += strlen(yytext);
-    return LOG;
-}
-
-{RELOP} {
-    printf("RELOP\t\t(%s) LENGTH %d\n", yytext, yyleng);
-    yylval.token = (char *) strdup(yytext);
-    column += strlen(yytext);
-    return RELOP;
 }
 
 {ID} {

@@ -97,16 +97,17 @@ void semantic_error_set_arith_op();
     struct node* node;
 }
 
-%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES CHAR THEN
+%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES CHAR THEN EQ NE LE GE OR AND NOT L G
 
 %right <token> ASSIGN
 
-%left <token> OP RELOP LOG
+%left <token> ADD_OP SUB
+%left <token> MULT DIV
 
 %nonassoc THEN ELSE
 
 %type <node> program declaration-list variable-declaration function params-list compound-stmt params stmt-list stmt set-func expr simple-expr conditional-stmt
-             iteration-stmt return-stmt write-stmt writeln-stmt read-stmt var op-expr in-stmt term call args arg-list  error compound-inline
+             iteration-stmt return-stmt write-stmt writeln-stmt read-stmt var op-expr in-stmt term call args arg-list  error compound-inline OP LOG RELOP
 
 %%
 program:
@@ -259,7 +260,7 @@ simple-expr:
     op-expr { 
         $$ = $1; 
     }
-    | LOG set-func {
+    | NOT set-func {
         $$ = create_tree_node("LOGICAL_EXPRESSION", $2, NULL, NULL, $1);
     }
     | set-func {
@@ -347,21 +348,58 @@ var:
 
 op-expr:
     op-expr OP term {
-        $$ = create_tree_node("ARITHIMETIC_EXPRESSION", $1, $3, NULL, $2);
+        $$ = create_tree_node("ARITHIMETIC_EXPRESSION", $1, $3, NULL, $2->value);
         define_type($$);
     }
     | op-expr LOG term { 
-        $$ = create_tree_node("LOGICAL_EXPRESSION", $1, $3, NULL, $2);
+        $$ = create_tree_node("LOGICAL_EXPRESSION", $1, $3, NULL, $2->value);
         define_type($$);
     }
     | op-expr RELOP term { 
-        $$ = create_tree_node("RELATIONAL_EXPRESSION", $1, $3, NULL, $2);
+        $$ = create_tree_node("RELATIONAL_EXPRESSION", $1, $3, NULL, $2->value);
         define_type($$);
     }
     | term { 
         $$ = $1; 
     }
 ;
+
+OP: ADD_OP {
+        $$ = create_tree_node("ADD_OP", NULL, NULL, NULL, $1);
+    }| SUB{
+        $$ = create_tree_node("SUB_OP", NULL, NULL, NULL, $1);
+    } | MULT {
+        $$ = create_tree_node("MULT_OP", NULL, NULL, NULL, $1);
+    }| DIV {
+        $$ = create_tree_node("DIV_OP", NULL, NULL, NULL, $1);
+    }
+;
+
+RELOP: GE {
+        $$ = create_tree_node("GE_OP", NULL, NULL, NULL, $1);
+    }| LE{
+        $$ = create_tree_node("LE_OP", NULL, NULL, NULL, $1);
+    } | G {
+        $$ = create_tree_node("G_OP", NULL, NULL, NULL, $1);
+    }| L {
+       $$ = create_tree_node("L_OP", NULL, NULL, NULL, $1);
+    }| NE {
+        $$ = create_tree_node("NE_OP", NULL, NULL, NULL, $1);
+    }| EQ {
+        $$ = create_tree_node("EQ_OP", NULL, NULL, NULL, $1);
+    }
+;
+
+LOG: OR {
+        $$ = create_tree_node("OR_OP", NULL, NULL, NULL, $1);
+    }| AND{
+        $$ = create_tree_node("AND_OP", NULL, NULL, NULL, $1);
+    } | NOT {
+        $$ = create_tree_node("NOT_OP", NULL, NULL, NULL, $1);
+    }
+;
+
+
 
 term:
     '(' simple-expr ')' { 
