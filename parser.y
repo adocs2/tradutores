@@ -18,6 +18,7 @@ extern int column;
 extern int lex_error;
 extern void yyerror(const char* msg);
 extern FILE *yyin;
+int aux_register = 0;
 
 typedef struct node {
     char* class;  
@@ -25,6 +26,7 @@ typedef struct node {
     struct node* right;
     char* type;
     char* value;
+    char* instruction;
 } node;
 
 node* parser_tree = NULL;
@@ -97,10 +99,11 @@ void semantic_error_set_arith_op();
     struct node* node;
 }
 
-%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES CHAR THEN EQ NE LE GE OR AND NOT L G
+%token <token> INT FLOAT SET STR ELEM EMPTY TYPE ID IF ELSE RETURN FOR FORALL READ ADD REMOVE IN WRITE WRITELN EXISTS IS_SET QUOTES CHAR THEN OR AND NOT  
 
 %right <token> ASSIGN
 
+%left <token> L G EQ NE LE GE
 %left <token> ADD_OP SUB
 %left <token> MULT DIV
 
@@ -919,7 +922,7 @@ void semantic_error_return_type(char* return_type, char* type){
 // Erro semântico de numero de argumentos errado
 void semantic_error_wrong_number_arguments(char* function_name, int number_args, int number_param){
     char *error = (char *)malloc(
-        (strlen(function_name) + 71) * sizeof(char)
+        (strlen(function_name) + 80) * sizeof(char)
     );
     sprintf(error, "semantic error, call of function (%s) with %d arguments, expected %d", function_name, number_args, number_param);
     yyerror(error);
@@ -929,7 +932,7 @@ void semantic_error_wrong_number_arguments(char* function_name, int number_args,
 // Erro semântico de tipo incompatível entre arg e params
 void semantic_error_type_mismatch_args(char* function_name, char* arg_name, char* type_arg, char* param_name, char* type_param){
     char *error = (char *)malloc(
-        (strlen(function_name) + strlen(type_param) + strlen(type_arg) + strlen(arg_name) + strlen(param_name) + 118) * sizeof(char)
+        (strlen(function_name) + strlen(type_param) + strlen(type_arg) + strlen(arg_name) + strlen(param_name) + 130) * sizeof(char)
     );
     sprintf(error, "semantic error, type mismatch between argument (%s) of type %s and param (%s) of type %s during call of function (%s)", arg_name, type_arg, param_name, type_param, function_name);
     yyerror(error);
@@ -983,6 +986,24 @@ node* create_tree_node(char* class, node* left, node* right, char* type, char* v
     aux_node->type = type;
     aux_node->value = value;
 
+    if(strcmp(aux_node->class, "ARITHIMETIC_EXPRESSION") == 0){
+        if(strcmp(aux_node->value, "+") == 0){
+            aux_node->instruction = "add";
+        }
+
+        else if(strcmp(aux_node->value, "-") == 0){
+            aux_node->instruction = "sub";;
+        }
+
+        else if(strcmp(aux_node->value, "*") == 0){
+            aux_node->instruction = "mul";
+        }
+
+        else if(strcmp(aux_node->value, "/") == 0){
+            aux_node->instruction = "div";
+        }
+    }
+
     return aux_node;
 }
 
@@ -1029,6 +1050,7 @@ void print_depth(int depth) {
     }
 }
 
+
 // Printa parser tree
 void print_parser_tree(node * tree, int depth) {
     if (tree) {
@@ -1063,6 +1085,82 @@ char* concat_string(const char *s1, const char *s2){
     return result;
 }
 
+FILE *create_tac() {
+    return fopen("code.tac", "w+");
+}
+
+void close_tac(FILE *fp_tac) {
+    fclose(fp_tac);
+}
+
+void write_table(FILE *fp_tac) {
+    fprintf(fp_tac, ".table\n");
+    symbol_node *s;
+    for(s=symbol_table; s != NULL; s=s->hh.next) {
+        if(strcmp(s->symbol_type, "variable") == 0 ){
+            fprintf(fp_tac, "\t%s %s \n", s->type, s->name);
+        }
+    }
+}
+
+void arith_assembly(FILE *fp_tac, node * tree) {
+    if (strcmp(tree->left->class,"ARITHIMETIC_EXPRESSION") == 0){
+        arith_assembly(fp_tac, tree->left);
+        fprintf(fp_tac, "\t%s $%d, $%d, %s \n", tree->instruction , aux_register, aux_register, tree->right->value);
+    } else {
+        fprintf(fp_tac, "\t%s $%d, %s, %s \n", tree->instruction , aux_register, tree->left->value, tree->right->value);
+    }
+}
+
+void write_assembly(FILE *fp_tac, node * tree) {
+    if(tree) {
+        if (strcmp(tree->class,"ASSIGN_EXPRESSION") == 0){
+            if (strcmp(tree->right->class,"ARITHIMETIC_EXPRESSION") == 0){
+                arith_assembly(fp_tac, tree->right);
+                fprintf(fp_tac, "\tmov %s, $%d \n", tree->left->value, aux_register);
+                aux_register++;
+            } else {
+                fprintf(fp_tac, "\tmov %s, %s \n", tree->left->value, tree->right->value);
+            }
+        }
+
+        if (strcmp(tree->class,"WRITE_STATEMENT") == 0){
+            if (tree->left != NULL && strcmp(tree->left->class,"VARIABLE") == 0) {
+                fprintf(fp_tac, "\tprint %s\n", tree->left->value);
+            } else {
+                 if (strlen(tree->value) > 1) {
+                    for(int i = 1; i < strlen(tree->value) - 1; ++i){
+                        fprintf(fp_tac, "\tprint \'%c\'\n", tree->value[i]);
+                    }
+                } else {
+                    fprintf(fp_tac, "\tprint %s\n", tree->value);
+                }
+            }
+        }
+
+        if (strcmp(tree->class,"WRITELN_STATEMENT") == 0){
+              if (tree->left != NULL && strcmp(tree->left->class,"VARIABLE") == 0) {
+                fprintf(fp_tac, "\tprintln %s\n", tree->left->value);
+            } else {
+                if (strlen(tree->value) > 1) {
+                    for(int i = 1; i < strlen(tree->value) - 1; ++i){
+                        fprintf(fp_tac, "\tprintln \'%c\'\n", tree->value[i]);
+                    }
+                } else {
+                    fprintf(fp_tac, "\tprintln %s\n", tree->value);
+                }
+            }
+        }
+        write_assembly(fp_tac, tree->left);
+        write_assembly(fp_tac, tree->right);
+    }
+}
+
+void write_code(FILE *fp_tac, node * tree) {
+    fprintf(fp_tac, "\n.code\nmain:\n");
+    write_assembly(fp_tac, tree);
+}
+
 int main(int argc, char **argv) {
     if(argc > 1) {
         yyin = fopen(argv[1], "r");
@@ -1070,13 +1168,17 @@ int main(int argc, char **argv) {
     else {
         yyin = stdin;
     }
-    printf("----------  ANALISADOR LÉXICO ----------\n\n");
+    // printf("----------  ANALISADOR LÉXICO ----------\n\n");
     init_scope_global();
     yyparse();
     print_symbol_table();
     if (total_errors == 0) {    
-    printf("\n\n----------  AST ----------\n\n");
+        printf("\n\n----------  AST ----------\n\n");
         print_parser_tree(parser_tree, 0);
+        FILE *fp_tac = create_tac();
+        write_table(fp_tac);
+        write_code(fp_tac, parser_tree);
+        close_tac(fp_tac);
         free_parser_tree(parser_tree);
     }
     printf("Total de Erros: %d\n", total_errors);

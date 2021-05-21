@@ -2,14 +2,17 @@ int main () {
    int x;
    int s;
    int acce;
-     forall(x in s) {
-        if (!x) {
-           int acc;
-           acc = acc + x;
-           acce = acc + x;
-        }
-        writeln(acce);
-        writeln('a');
-        writeln("opa");
-     }
+   forall(x in s) {
+      if (!x) {
+         int acc;
+         acc = acc + x;
+         acce = acc + x;
+      }
+      writeln(acce);
+      writeln('a');
+      writeln("opa");
+   }
+   if(x<s){
+      writeln("Valor de cashback recebido (10%): ");
+   }
 }

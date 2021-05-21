@@ -69,16 +69,16 @@ extern int yydebug;
     QUOTES = 279,
     CHAR = 280,
     THEN = 281,
-    EQ = 282,
-    NE = 283,
-    LE = 284,
-    GE = 285,
-    OR = 286,
-    AND = 287,
-    NOT = 288,
-    L = 289,
-    G = 290,
-    ASSIGN = 291,
+    OR = 282,
+    AND = 283,
+    NOT = 284,
+    ASSIGN = 285,
+    L = 286,
+    G = 287,
+    EQ = 288,
+    NE = 289,
+    LE = 290,
+    GE = 291,
     ADD_OP = 292,
     SUB = 293,
     MULT = 294,
@@ -91,7 +91,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 95 "parser.y" /* yacc.c:1909  */
+#line 97 "parser.y" /* yacc.c:1909  */
 
     char* token;
     struct node* node;

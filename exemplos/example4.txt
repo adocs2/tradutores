@@ -1,14 +1,14 @@
 int main () {
    int s;
    int acce;
-     forall(x in s) {
-        if (!is_set(x)) {
-           int acc;
-           acc = acc + x;
-           acce = acc + x;
-        }
-        writeln(acce);
-        writeln('a');
-        writeln("opa");
-     }
+   forall(x in s) {
+      if (!is_set(x)) {
+         int acc;
+         acc = acc + x;
+         acce = acc + x;
+      }
+   writeln(acce);
+   writeln('a');
+   writeln("opa");
+   }
 }
